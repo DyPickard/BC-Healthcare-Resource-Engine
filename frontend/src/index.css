@@ -1,0 +1,39 @@
+@keyframes pulseDot {
+  0% { opacity: 1; }
+  50% { opacity: 0.35; }
+  100% { opacity: 1; }
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #eef1f4;
+  font-family: 'IBM Plex Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: #0e7c86;
+}
+
+a:hover {
+  color: #0b616a;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c7cfd6;
+  border-radius: 8px;
+}
+
+#root {
+  min-height: 100vh;
+}

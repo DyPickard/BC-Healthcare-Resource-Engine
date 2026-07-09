@@ -1,0 +1,7 @@
+.env
+secrets.json
+.venv/
+.claude/
+__pycache__/
+*.log
+*.tmp
