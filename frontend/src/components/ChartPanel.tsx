@@ -153,8 +153,12 @@ export default function ChartPanel({ series, metrics, selectedMetric, onSelectMe
               ))}
             </div>
           </div>
-        </div>
-        <ForecastChart points={filteredPoints} />
+          </div>
+          <ForecastChart 
+            points={filteredPoints} 
+            unit={series.unit} 
+            yAxisLabel={`${series.metricLabel} (${series.unit.trim()})`} 
+          />
           <div
             style={{
               display: 'flex',

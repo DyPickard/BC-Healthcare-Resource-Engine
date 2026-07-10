@@ -14,9 +14,11 @@ import type { SeriesPoint } from '../types'
 
 interface Props {
   points: SeriesPoint[]
+  unit?: string
+  yAxisLabel?: string
 }
 
-export default function ForecastChart({ points }: Props) {
+export default function ForecastChart({ points, unit = '%', yAxisLabel = 'Utilization (%)' }: Props) {
   if (points.length === 0) return null
 
   // Find the boundary where the forecast begins
@@ -68,13 +70,13 @@ export default function ForecastChart({ points }: Props) {
             axisLine={false}
             tickLine={false}
           >
-            <Label value="Utilization (%)" angle={-90} position="insideLeft" offset={-5} style={{ fill: theme.color.textMuted, fontSize: 12, fontWeight: 500 }} />
+            <Label value={yAxisLabel} angle={-90} position="insideLeft" offset={-5} style={{ fill: theme.color.textMuted, fontSize: 12, fontWeight: 500 }} />
           </YAxis>
 
           <Tooltip
             contentStyle={{ borderRadius: 8, borderColor: theme.color.border, fontFamily: theme.font.sans }}
             formatter={(value: number, name: string) => [
-              `${value.toFixed(1)}%`,
+              `${value.toFixed(1)}${unit}`,
               name === 'historyValue' ? 'Actual' : 'Forecast'
             ]}
             labelStyle={{ color: theme.color.text, fontWeight: 600, marginBottom: 4 }}

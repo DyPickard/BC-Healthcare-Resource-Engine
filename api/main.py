@@ -33,7 +33,7 @@ METRICS = {
         "column": "smoothed_utilization",
         "available": True,
     },
-    "erWait": {"label": "ER Wait Time", "unit": " min", "decimals": 0, "column": None, "available": False},
+    "erWait": {"label": "ER Wait Time", "unit": " min", "decimals": 0, "column": "smoothed_er_wait_time", "available": True},
     "admissions": {"label": "Daily Admissions", "unit": "/day", "decimals": 0, "column": None, "available": False},
     "staffing": {"label": "Patients per Nurse", "unit": ":1", "decimals": 1, "column": None, "available": False},
 }
@@ -102,18 +102,28 @@ def get_regions():
 def get_kpis():
     df = _load_df()
     utils = []
+    waits = []
     elevated_count = 0
+    
     for r in REGIONS:
         latest = _latest_actual(df, r["db_name"])
         util = float(latest["smoothed_utilization"])
         utils.append(util)
+        
+        # Grab the ER wait time if it exists
+        if "smoothed_er_wait_time" in latest and pd.notna(latest["smoothed_er_wait_time"]):
+            waits.append(float(latest["smoothed_er_wait_time"]))
+            
         if _status_for(util)["label"] != "Normal":
             elevated_count += 1
+            
+    avg_wait = round(sum(waits) / len(waits)) if waits else None
+    
     return {
         "avgBedUtil": round(sum(utils) / len(utils), 1),
         "elevatedCount": elevated_count,
         "totalRegions": len(REGIONS),
-        "avgErWait": None,
+        "avgErWait": avg_wait,
         "avgStaffing": None,
     }
 

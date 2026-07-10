@@ -4,7 +4,7 @@ A lightweight analytics demo for exploring acute care bed utilization across Bri
 
 ## What this app does
 
-The app models regional capacity pressure by generating synthetic monthly healthcare metrics, transforming them into utilization indicators, forecasting the next six months with Prophet, and presenting the results through an interactive dashboard.
+The app models regional capacity pressure by generating synthetic monthly healthcare metrics (specifically modeling "Access Block" where high bed utilization drives up ER Wait Times). It transforms these into key performance indicators, forecasts the next six months with Prophet across multiple metrics, and presents the results through an interactive, multi-metric dashboard.
 
 ## Current architecture
 
@@ -17,7 +17,7 @@ The repository now follows a three-layer architecture:
 ## How it works
 
 1. The extractor in [pipeline/extractor.py](pipeline/extractor.py) creates synthetic monthly health metrics for each health authority.
-2. The transformer in [pipeline/transformer.py](pipeline/transformer.py) calculates bed utilization, applies a 3-month moving average, and runs a Prophet forecast for six future months.
+2. The transformer in [pipeline/transformer.py](pipeline/transformer.py) calculates bed utilization and ER Wait Times, applies a 3-month moving average, and dynamically runs Prophet forecasts across both metrics for six future months.
 3. The processed data is written to SQLite in [data](data), with tables for raw metrics and the cleaned forecasted dataset.
 4. The FastAPI service reads the SQLite database and exposes structured JSON endpoints for the frontend.
 5. The frontend requests those endpoints and renders KPI cards, a regional map, charts, and a detail table.
@@ -60,11 +60,11 @@ This runs the extractor and transformer inside a container and writes the SQLite
 docker compose up
 ```
 
-This builds and starts the FastAPI backend on http://localhost:8000 and the Vite dev server on http://localhost:5173, with the frontend's `/api` proxy routed to the backend container. The `frontend` and `data` directories are bind-mounted, so edits and dataset changes are picked up without rebuilding.
+This builds and starts the FastAPI backend on http://localhost:8000 and the Vite dev server on http://localhost:5173, with the frontend's `/api` proxy routed to the backend container. The `frontend`, `api`, and `data` directories are bind-mounted, so edits and dataset changes are picked up without rebuilding.
 
 Then open http://localhost:5173. Stop everything with `docker compose down`.
 
 ## Notes
 
 - The dataset is synthetic and intended for demonstration and testing rather than production decision-making.
-- The current UI exposes bed utilization forecasting; other metrics shown in the design are placeholders until the pipeline produces them.
+- The current UI exposes forecasting for Bed Utilization and ER Wait Times; other metrics shown in the design (Daily Admissions and Staffing) are placeholders until the pipeline is further expanded.
