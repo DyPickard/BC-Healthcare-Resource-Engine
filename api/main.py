@@ -184,3 +184,25 @@ def get_metrics():
         {"key": key, "label": m["label"], "unit": m["unit"], "available": m["available"]}
         for key, m in METRICS.items()
     ]
+
+
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))
+
+if os.path.exists(frontend_dist):
+    # Mount assets folder
+    assets_dir = os.path.join(frontend_dist, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    # Catch-all route to serve SPA
+    @app.get("/{catchall:path}")
+    def serve_spa(catchall: str):
+        requested_file = os.path.join(frontend_dist, catchall)
+        if os.path.isfile(requested_file):
+            return FileResponse(requested_file)
+        
+        index_file = os.path.join(frontend_dist, "index.html")
+        return FileResponse(index_file)
