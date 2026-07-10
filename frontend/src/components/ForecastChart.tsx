@@ -75,8 +75,8 @@ export default function ForecastChart({ points, unit = '%', yAxisLabel = 'Utiliz
 
           <Tooltip
             contentStyle={{ borderRadius: 8, borderColor: theme.color.border, fontFamily: theme.font.sans }}
-            formatter={(value: number, name: string) => [
-              `${value.toFixed(1)}${unit}`,
+            formatter={(value: any, name: any) => [
+              `${Number(value).toFixed(1)}${unit}`,
               name === 'historyValue' ? 'Actual' : 'Forecast'
             ]}
             labelStyle={{ color: theme.color.textPrimary, fontWeight: 600, marginBottom: 4 }}
