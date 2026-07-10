@@ -60,38 +60,37 @@ export default function ChartPanel({ series, metrics, selectedMetric, onSelectMe
 
   return (
     <div style={{ background: theme.color.surface, border: `1px solid ${theme.color.border}`, borderRadius: 3, padding: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: theme.color.textPrimary }}>
-            {series?.regionName ?? '—'}
-          </div>
-          <div style={{ fontSize: 11.5, color: theme.color.textSecondary }}>
-            {series?.metricLabel ?? ''} · {showForecast ? 'history + 6-month forecast' : 'historical data only'}
-          </div>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 18, fontWeight: 600, color: theme.color.textPrimary, marginBottom: 2 }}>
+          {series?.regionName ?? '—'}
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          {metrics.map((m) => (
-            <div
-              key={m.key}
-              onClick={() => m.available && onSelectMetric(m.key)}
-              title={m.available ? undefined : 'Coming soon — not yet produced by the data pipeline'}
-              style={{
-                fontSize: 11.5,
-                fontWeight: 500,
-                padding: '6px 10px',
-                minWidth: 120,
-                textAlign: 'center',
-                borderRadius: 3,
-                cursor: m.available ? 'pointer' : 'not-allowed',
-                background: m.key === selectedMetric ? theme.color.accent : '#f0f2f4',
-                color: !m.available ? '#b7c0c7' : m.key === selectedMetric ? '#ffffff' : '#5a6670',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              {m.label}
-            </div>
-          ))}
+        <div style={{ fontSize: 13, color: theme.color.textSecondary }}>
+          {series?.metricLabel ?? ''} · {showForecast ? 'history + 6-month forecast' : 'historical data only'}
         </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+        {metrics.map((m) => (
+          <div
+            key={m.key}
+            onClick={() => m.available && onSelectMetric(m.key)}
+            title={m.available ? undefined : 'Coming soon — not yet produced by the data pipeline'}
+            style={{
+              fontSize: 11.5,
+              fontWeight: 500,
+              padding: '6px 10px',
+              minWidth: 120,
+              textAlign: 'center',
+              borderRadius: 3,
+              cursor: m.available ? 'pointer' : 'not-allowed',
+              background: m.key === selectedMetric ? theme.color.accent : '#f0f2f4',
+              color: !m.available ? '#b7c0c7' : m.key === selectedMetric ? '#ffffff' : '#5a6670',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            {m.label}
+          </div>
+        ))}
       </div>
 
       {!series || loading ? (
@@ -109,18 +108,23 @@ export default function ChartPanel({ series, metrics, selectedMetric, onSelectMe
         </div>
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-              <div style={{ fontSize: 24, fontWeight: 600, color: theme.color.textPrimary, fontFamily: theme.font.mono }}>
-                {series.current != null ? `${series.current}${series.unit}` : '—'}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: theme.color.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Current {series.metricLabel}
               </div>
-              {series.delta != null && (
-                <div style={{ fontSize: 12.5, fontWeight: 500, color: deltaColor }}>
-                  {series.delta >= 0 ? '+' : ''}
-                  {series.delta}
-                  {series.unit} vs 6mo ago
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                <div style={{ fontSize: 24, fontWeight: 600, color: theme.color.textPrimary, fontFamily: theme.font.mono, lineHeight: 1.1 }}>
+                  {series.current != null ? `${series.current}${series.unit}` : '—'}
                 </div>
-              )}
+                {series.delta != null && (
+                  <div style={{ fontSize: 12.5, fontWeight: 500, color: deltaColor }}>
+                    {series.delta >= 0 ? '+' : ''}
+                    {series.delta}
+                    {series.unit} vs 6mo ago
+                  </div>
+                )}
+              </div>
             </div>
             
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>

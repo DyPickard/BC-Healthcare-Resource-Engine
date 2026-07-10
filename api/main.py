@@ -34,7 +34,7 @@ METRICS = {
         "available": True,
     },
     "erWait": {"label": "ER Wait Time", "unit": " min", "decimals": 0, "column": "smoothed_er_wait_time", "available": True},
-    "admissions": {"label": "Daily Admissions", "unit": "/day", "decimals": 0, "column": None, "available": False},
+    "admissions": {"label": "Daily Admissions", "unit": "/day", "decimals": 0, "column": "smoothed_daily_admissions", "available": True},
     "staffing": {"label": "Patients per Nurse", "unit": ":1", "decimals": 1, "column": None, "available": False},
 }
 

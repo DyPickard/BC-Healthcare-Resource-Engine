@@ -28,6 +28,10 @@ def run_transformations_and_forecast():
     df_raw["smoothed_er_wait_time"] = df_raw.groupby("health_authority")["er_wait_time"].transform(
         lambda x: x.rolling(window=3, min_periods=1).mean()
     )
+
+    df_raw["smoothed_daily_admissions"] = df_raw.groupby("health_authority")["daily_admissions"].transform(
+        lambda x: x.rolling(window=3, min_periods=1).mean()
+    )
     
     forecast_records = []
     health_authorities = df_raw["health_authority"].unique()
@@ -37,9 +41,9 @@ def run_transformations_and_forecast():
         df_ha = df_raw[df_raw["health_authority"] == ha].copy()
         
         forecast_results = {"ref_date": [], "smoothed_utilization": [],
-        "smoothed_er_wait_time": []}
+        "smoothed_er_wait_time": [], "smoothed_daily_admissions": []}
 
-        for metric in ["smoothed_utilization", "smoothed_er_wait_time"]:
+        for metric in ["smoothed_utilization", "smoothed_er_wait_time", "smoothed_daily_admissions"]:
             df_prophet = df_ha[["ref_date", metric]].rename(columns=
             {"ref_date": "ds", metric: "y"})
 
@@ -69,8 +73,10 @@ def run_transformations_and_forecast():
                 "bed_utilization_rate": None,
                 "avg_length_of_stay": None,
                 "er_wait_time": None,
+                "daily_admissions": None,
                 "smoothed_utilization": forecast_results["smoothed_utilization"][i],
                 "smoothed_er_wait_time": forecast_results["smoothed_er_wait_time"][i],
+                "smoothed_daily_admissions": forecast_results["smoothed_daily_admissions"][i],
                 "is_forecast": 1
             })
             

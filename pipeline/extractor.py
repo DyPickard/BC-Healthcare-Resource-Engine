@@ -53,6 +53,10 @@ def generate_provincial_health_data():
             
             # calculate ER wait time based on hospital utilization (higher util = longer wait)
             er_wait_minutes = int(30 + (adjusted_utilization * 150) + np.random.uniform(-15, 15))
+            
+            # calculate Daily Admissions (roughly equal to discharges over a month)
+            total_admissions = int(discharges * np.random.uniform(0.95, 1.05))
+            daily_admissions = int(total_admissions / 30)
 
             all_records.append({
                 "ref_date": current_month,
@@ -60,7 +64,8 @@ def generate_provincial_health_data():
                 "total_beds": base_beds,
                 "patient_days": patient_days,
                 "total_discharges": discharges,
-                "er_wait_time": max(er_wait_minutes, 0)
+                "er_wait_time": max(er_wait_minutes, 0),
+                "daily_admissions": max(daily_admissions, 0)
             })
 
     df_raw = pd.DataFrame(all_records)
