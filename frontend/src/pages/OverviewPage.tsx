@@ -50,7 +50,7 @@ export default function OverviewPage({ regions, kpis }: Props) {
         }}
       >
         <div style={{ display: 'flex', minHeight: 900 }}>
-          <Sidebar regions={regions} selectedId={null} onSelect={(id) => navigate(`/region/${id}`)} />
+          <Sidebar regions={regions} selectedId={undefined} onSelect={(id) => navigate(`/region/${id}`)} />
           
           <div style={{ flex: 1, minWidth: 0, padding: '24px 28px', background: theme.color.canvasInner }}>
             <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.05em', color: theme.color.textSecondary, textTransform: 'uppercase', marginBottom: 12 }}>
@@ -60,7 +60,7 @@ export default function OverviewPage({ regions, kpis }: Props) {
             <div style={{ marginTop: 16 }}>
               <RegionalMap
                 regions={regions}
-                selectedId={null}
+                selectedId={undefined}
                 onSelect={(id) => navigate(`/region/${id}`)}
                 maxHeight={760}
                 showTitle={false}

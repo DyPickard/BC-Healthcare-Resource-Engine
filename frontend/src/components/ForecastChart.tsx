@@ -79,7 +79,7 @@ export default function ForecastChart({ points, unit = '%', yAxisLabel = 'Utiliz
               `${value.toFixed(1)}${unit}`,
               name === 'historyValue' ? 'Actual' : 'Forecast'
             ]}
-            labelStyle={{ color: theme.color.text, fontWeight: 600, marginBottom: 4 }}
+            labelStyle={{ color: theme.color.textPrimary, fontWeight: 600, marginBottom: 4 }}
           />
 
           {/* Shaded background for the forecast period */}
