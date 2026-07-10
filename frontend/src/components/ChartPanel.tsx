@@ -79,10 +79,13 @@ export default function ChartPanel({ series, metrics, selectedMetric, onSelectMe
                 fontSize: 11.5,
                 fontWeight: 500,
                 padding: '6px 10px',
+                minWidth: 120,
+                textAlign: 'center',
                 borderRadius: 3,
                 cursor: m.available ? 'pointer' : 'not-allowed',
                 background: m.key === selectedMetric ? theme.color.accent : '#f0f2f4',
                 color: !m.available ? '#b7c0c7' : m.key === selectedMetric ? '#ffffff' : '#5a6670',
+                transition: 'all 0.15s ease',
               }}
             >
               {m.label}
@@ -94,7 +97,7 @@ export default function ChartPanel({ series, metrics, selectedMetric, onSelectMe
       {!series || loading ? (
         <div
           style={{
-            height: 200,
+            height: 330,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
