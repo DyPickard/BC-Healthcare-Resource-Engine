@@ -35,6 +35,7 @@ The repository now follows a three-layer architecture:
 - Python 3
 - FastAPI + Uvicorn for the backend API
 - React + Vite + TypeScript for the frontend
+- Recharts for interactive UI graphs
 - pandas, NumPy, and scikit-learn for data preparation
 - Prophet for time-series forecasting
 - SQLite for local storage
@@ -51,7 +52,7 @@ A prebuilt SQLite database is committed at [data/bc_healthcare.db](data/bc_healt
 docker compose run --rm pipeline
 ```
 
-This runs the extractor and transformer inside a container and writes the SQLite database to [data/bc_healthcare.db](data/bc_healthcare.db) via a bind mount.
+This runs the extractor and transformer inside a container and writes the SQLite database to [data/bc_healthcare.db](data/bc_healthcare.db) via a bind mount. The `pipeline` directory is also bind-mounted, so you can freely tweak the math in the generation scripts without needing to rebuild the Docker image!
 
 ### 2. Start the app
 

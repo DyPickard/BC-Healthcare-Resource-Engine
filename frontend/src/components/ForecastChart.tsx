@@ -1,3 +1,14 @@
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ReferenceArea,
+  CartesianGrid,
+  Label
+} from 'recharts'
 import { theme } from '../theme'
 import type { SeriesPoint } from '../types'
 
@@ -5,29 +16,10 @@ interface Props {
   points: SeriesPoint[]
 }
 
-const CHART_W = 640
-const CHART_H = 200
-const PAD_TOP = 10
-const PAD_BOTTOM = 20
-
-// Ported from the design's buildPanel() chart math: min/max-scale the series
-// into the SVG box, split it at the last actual (non-forecast) point into a
-// solid history polyline and a dashed forecast polyline, with a tinted band
-// behind the forecast segment.
 export default function ForecastChart({ points }: Props) {
   if (points.length === 0) return null
 
-  const values = points.map((p) => p.value)
-  const min = Math.min(...values)
-  const max = Math.max(...values)
-  const range = max - min || 1
-
-  const toXY = (i: number) => {
-    const x = (i / (points.length - 1)) * CHART_W
-    const y = CHART_H - PAD_BOTTOM - ((points[i].value - min) / range) * (CHART_H - PAD_TOP - PAD_BOTTOM)
-    return `${x.toFixed(1)},${y.toFixed(1)}`
-  }
-
+  // Find the boundary where the forecast begins
   let lastHistoryIdx = points.length - 1
   for (let i = points.length - 1; i >= 0; i--) {
     if (!points[i].isForecast) {
@@ -36,33 +28,89 @@ export default function ForecastChart({ points }: Props) {
     }
   }
 
-  const historyPoints: string[] = []
-  for (let i = 0; i <= lastHistoryIdx; i++) historyPoints.push(toXY(i))
+  // To connect the history line and the forecast line smoothly,
+  // the exact point where history ends must be shared by both lines.
+  const chartData = points.map((p, i) => {
+    const isHistoryOrConnect = i <= lastHistoryIdx
+    const isForecastOrConnect = i >= lastHistoryIdx
 
-  const forecastPoints: string[] = []
-  for (let i = lastHistoryIdx; i < points.length; i++) forecastPoints.push(toXY(i))
+    return {
+      month: p.month,
+      historyValue: isHistoryOrConnect ? p.value : null,
+      forecastValue: isForecastOrConnect ? p.value : null,
+      isForecastArea: p.isForecast
+    }
+  })
 
-  const forecastX = points.length > 1 ? (lastHistoryIdx / (points.length - 1)) * CHART_W : CHART_W
-  const forecastW = CHART_W - forecastX
+  // Determine the start and end of the forecast background area
+  const firstForecastMonth = points[lastHistoryIdx].month
+  const lastForecastMonth = points[points.length - 1].month
 
   return (
-    <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} style={{ width: '100%', height: 200, display: 'block' }}>
-      <line x1={0} y1={170} x2={CHART_W} y2={170} stroke={theme.color.border} strokeWidth={1} />
-      <line x1={0} y1={100} x2={CHART_W} y2={100} stroke={theme.color.borderFaint} strokeWidth={1} />
-      <line x1={0} y1={30} x2={CHART_W} y2={30} stroke={theme.color.borderFaint} strokeWidth={1} />
-      {forecastPoints.length > 1 && (
-        <rect x={forecastX} y={0} width={forecastW} height={CHART_H} fill={theme.color.accent} opacity={0.06} />
-      )}
-      <polyline points={historyPoints.join(' ')} fill="none" stroke={theme.color.accent} strokeWidth={2.5} />
-      {forecastPoints.length > 1 && (
-        <polyline
-          points={forecastPoints.join(' ')}
-          fill="none"
-          stroke={theme.color.accent}
-          strokeWidth={2.5}
-          strokeDasharray="5,5"
-        />
-      )}
-    </svg>
+    <div style={{ width: '100%', height: 250 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme.color.borderFaint} />
+
+          <XAxis
+            dataKey="month"
+            tick={{ fontSize: 12, fill: theme.color.textMuted }}
+            axisLine={false}
+            tickLine={false}
+            minTickGap={20}
+          >
+            <Label value="Month" offset={-15} position="insideBottom" style={{ fill: theme.color.textMuted, fontSize: 12, fontWeight: 500 }} />
+          </XAxis>
+
+          <YAxis
+            domain={['auto', 'auto']}
+            tick={{ fontSize: 12, fill: theme.color.textMuted }}
+            axisLine={false}
+            tickLine={false}
+          >
+            <Label value="Utilization (%)" angle={-90} position="insideLeft" offset={-5} style={{ fill: theme.color.textMuted, fontSize: 12, fontWeight: 500 }} />
+          </YAxis>
+
+          <Tooltip
+            contentStyle={{ borderRadius: 8, borderColor: theme.color.border, fontFamily: theme.font.sans }}
+            formatter={(value: number, name: string) => [
+              `${value.toFixed(1)}%`,
+              name === 'historyValue' ? 'Actual' : 'Forecast'
+            ]}
+            labelStyle={{ color: theme.color.text, fontWeight: 600, marginBottom: 4 }}
+          />
+
+          {/* Shaded background for the forecast period */}
+          {lastHistoryIdx < points.length - 1 && (
+            <ReferenceArea x1={firstForecastMonth} x2={lastForecastMonth} fill={theme.color.accent} fillOpacity={0.06} />
+          )}
+
+          {/* Solid line for Historical Data */}
+          <Line
+            type="monotone"
+            dataKey="historyValue"
+            stroke={theme.color.accent}
+            strokeWidth={2.5}
+            dot={false}
+            activeDot={{ r: 6, fill: theme.color.accent }}
+            connectNulls
+            animationDuration={400}
+          />
+
+          {/* Dashed line for Forecast Data */}
+          <Line
+            type="monotone"
+            dataKey="forecastValue"
+            stroke={theme.color.accent}
+            strokeWidth={2.5}
+            strokeDasharray="5 5"
+            dot={false}
+            activeDot={{ r: 6, fill: theme.color.accent }}
+            connectNulls
+            animationDuration={400}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   )
 }

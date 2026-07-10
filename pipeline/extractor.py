@@ -38,7 +38,7 @@ def generate_provincial_health_data():
         for idx, current_month in enumerate(date_range):
             # extract month integer to compute seasonal wave patterns (Winter peaks)
             month_int = int(current_month.split("-")[1])
-            seasonal_wave = np.sin((month_int - 2) * (2 *   np.pi / 12)) * 0.15
+            seasonal_wave = np.sin((month_int - 2) * (2 *   np.pi / 12)) * 0.05
 
             # formulate simualted base ingestion load with subtle historical variance trend
             growth_trend = idx * 0.001

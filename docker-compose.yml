@@ -27,5 +27,6 @@ services:
     profiles: ["tools"]
     volumes:
       - ./data:/app/data
+      - ./pipeline:/app/pipeline
     command: >
       sh -c "python pipeline/extractor.py && python pipeline/transformer.py"
