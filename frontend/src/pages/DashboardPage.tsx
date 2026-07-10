@@ -42,7 +42,7 @@ export default function DashboardPage({ regions, kpis }: Props) {
       }}
     >
       <div style={{ width: 1360, maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <button
             onClick={() => navigate('/')}
             style={{
@@ -62,6 +62,11 @@ export default function DashboardPage({ regions, kpis }: Props) {
           <h1 style={{ margin: 0, fontSize: 28, fontWeight: 600, color: theme.color.textPrimary }}>
             BC Health Authorities Dashboard
           </h1>
+          <div style={{ marginLeft: 'auto' }}>
+            <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 4, background: '#fef3c7', color: '#b45309', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              Mock Data Demo
+            </span>
+          </div>
         </div>
 
         <section

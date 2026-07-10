@@ -4,7 +4,7 @@ A lightweight analytics demo for exploring acute care bed utilization across Bri
 
 ## What this app does
 
-The app models regional capacity pressure by generating synthetic monthly healthcare metrics (specifically modeling "Access Block" where high bed utilization drives up ER Wait Times). It transforms these into key performance indicators, forecasts the next six months with Prophet across multiple metrics, and presents the results through an interactive, multi-metric dashboard.
+The app models regional capacity pressure by generating synthetic monthly healthcare metrics across four key indicators: Bed Utilization, ER Wait Times, Daily Admissions, and Staffing Ratios (Patients per Nurse). It transforms these into key performance indicators, forecasts the next six months with Prophet across all metrics, and presents the results through an interactive, multi-metric dashboard.
 
 ## Current architecture
 
@@ -17,7 +17,7 @@ The repository now follows a three-layer architecture:
 ## How it works
 
 1. The extractor in [pipeline/extractor.py](pipeline/extractor.py) creates synthetic monthly health metrics for each health authority.
-2. The transformer in [pipeline/transformer.py](pipeline/transformer.py) calculates bed utilization and ER Wait Times, applies a 3-month moving average, and dynamically runs Prophet forecasts across both metrics for six future months.
+2. The transformer in [pipeline/transformer.py](pipeline/transformer.py) calculates bed utilization, applies a 3-month moving average across all four metrics, and dynamically runs Prophet forecasts for six future months.
 3. The processed data is written to SQLite in [data](data), with tables for raw metrics and the cleaned forecasted dataset.
 4. The FastAPI service reads the SQLite database and exposes structured JSON endpoints for the frontend.
 5. The frontend requests those endpoints and renders KPI cards, a regional map, charts, and a detail table.
@@ -67,4 +67,4 @@ Then open http://localhost:5173. Stop everything with `docker compose down`.
 ## Notes
 
 - The dataset is synthetic and intended for demonstration and testing rather than production decision-making.
-- The current UI exposes forecasting for Bed Utilization and ER Wait Times; other metrics shown in the design (Daily Admissions and Staffing) are placeholders until the pipeline is further expanded.
+- The current UI exposes historical tracking and 6-month AI forecasting for all four tracked metrics: Bed Utilization, ER Wait Times, Daily Admissions, and Patients per Nurse.

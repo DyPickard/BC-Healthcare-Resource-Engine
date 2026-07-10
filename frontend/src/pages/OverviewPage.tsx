@@ -24,13 +24,18 @@ export default function OverviewPage({ regions, kpis }: Props) {
         fontFamily: theme.font.sans,
       }}
     >
-      <div style={{ width: 1360, maxWidth: '100%', display: 'flex', alignItems: 'baseline', gap: 14 }}>
+      <div style={{ width: 1360, maxWidth: '100%', display: 'flex', alignItems: 'center', gap: 14 }}>
         <h1 style={{ margin: 0, fontSize: 28, fontWeight: 600, color: theme.color.textPrimary }}>
           BC Health Authorities Dashboard
         </h1>
-        <span style={{ fontSize: 14, color: theme.color.textSecondary }}>
+        <span style={{ fontSize: 14, color: theme.color.textSecondary, marginTop: 6 }}>
           province-wide overview · click a region to drill in
         </span>
+        <div style={{ marginLeft: 'auto' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 4, background: '#fef3c7', color: '#b45309', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            Mock Data Demo
+          </span>
+        </div>
       </div>
 
       <section

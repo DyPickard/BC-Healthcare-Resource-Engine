@@ -35,7 +35,7 @@ METRICS = {
     },
     "erWait": {"label": "ER Wait Time", "unit": " min", "decimals": 0, "column": "smoothed_er_wait_time", "available": True},
     "admissions": {"label": "Daily Admissions", "unit": "/day", "decimals": 0, "column": "smoothed_daily_admissions", "available": True},
-    "staffing": {"label": "Patients per Nurse", "unit": ":1", "decimals": 1, "column": None, "available": False},
+    "staffing": {"label": "Patients per Nurse", "unit": ":1", "decimals": 1, "column": "smoothed_patients_per_nurse", "available": True},
 }
 
 app = FastAPI(title="BC Healthcare Resource Engine API")
@@ -101,30 +101,32 @@ def get_regions():
 @app.get("/api/kpis")
 def get_kpis():
     df = _load_df()
-    utils = []
-    waits = []
-    elevated_count = 0
-    
-    for r in REGIONS:
-        latest = _latest_actual(df, r["db_name"])
-        util = float(latest["smoothed_utilization"])
-        utils.append(util)
-        
-        # Grab the ER wait time if it exists
-        if "smoothed_er_wait_time" in latest and pd.notna(latest["smoothed_er_wait_time"]):
-            waits.append(float(latest["smoothed_er_wait_time"]))
-            
-        if _status_for(util)["label"] != "Normal":
-            elevated_count += 1
-            
-    avg_wait = round(sum(waits) / len(waits)) if waits else None
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    latest_date = conn.execute("SELECT MAX(ref_date) FROM clean_capacity_forecast WHERE is_forecast = 0").fetchone()[0]
+
+    # Calculate provincial KPIs for that month
+    records = conn.execute("""
+        SELECT smoothed_utilization, smoothed_er_wait_time, smoothed_patients_per_nurse
+        FROM clean_capacity_forecast
+        WHERE ref_date = ? AND is_forecast = 0
+    """, (latest_date,)).fetchall()
+    conn.close()
+
+    if not records:
+        return {"avgBedUtil": 0, "elevatedCount": 0, "totalRegions": 5, "avgErWait": 0, "avgStaffing": None}
+
+    avg_util = round(sum([r["smoothed_utilization"] for r in records if r["smoothed_utilization"] is not None]) / len(records), 1)
+    avg_er_wait = round(sum([r["smoothed_er_wait_time"] for r in records if r["smoothed_er_wait_time"] is not None]) / len(records))
+    avg_staffing = round(sum([r["smoothed_patients_per_nurse"] for r in records if r["smoothed_patients_per_nurse"] is not None]) / len(records), 1)
+    elevated_count = sum([1 for r in records if r["smoothed_utilization"] and r["smoothed_utilization"] > 85.0])
     
     return {
-        "avgBedUtil": round(sum(utils) / len(utils), 1),
+        "avgBedUtil": avg_util,
         "elevatedCount": elevated_count,
-        "totalRegions": len(REGIONS),
-        "avgErWait": avg_wait,
-        "avgStaffing": None,
+        "totalRegions": 5,
+        "avgErWait": avg_er_wait,
+        "avgStaffing": avg_staffing
     }
 
 

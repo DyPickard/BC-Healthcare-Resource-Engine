@@ -57,6 +57,10 @@ def generate_provincial_health_data():
             # calculate Daily Admissions (roughly equal to discharges over a month)
             total_admissions = int(discharges * np.random.uniform(0.95, 1.05))
             daily_admissions = int(total_admissions / 30)
+            
+            # calculate Patients per Nurse (staffing ratio)
+            # Normal is ~4.5:1, but spikes as utilization maxes out
+            patients_per_nurse = round(3.5 + (adjusted_utilization * 4.0) + np.random.uniform(-0.5, 0.5), 2)
 
             all_records.append({
                 "ref_date": current_month,
@@ -65,7 +69,8 @@ def generate_provincial_health_data():
                 "patient_days": patient_days,
                 "total_discharges": discharges,
                 "er_wait_time": max(er_wait_minutes, 0),
-                "daily_admissions": max(daily_admissions, 0)
+                "daily_admissions": max(daily_admissions, 0),
+                "patients_per_nurse": max(patients_per_nurse, 1.0)
             })
 
     df_raw = pd.DataFrame(all_records)
