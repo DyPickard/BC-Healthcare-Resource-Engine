@@ -4,7 +4,7 @@ import RegionRow from './RegionRow'
 
 interface Props {
   regions: Region[]
-  selectedId: string
+  selectedId: string | null
   onSelect: (id: string) => void
 }
 
