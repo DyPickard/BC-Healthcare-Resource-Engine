@@ -12,7 +12,7 @@ function App() {
     return (
       <div style={{ padding: 56, fontFamily: theme.font.sans, color: theme.color.status.critical }}>
         Could not reach the API: {regionsError}. Is the backend running (
-        <code>uvicorn api.main:app --port 8000</code>)?
+        <code>docker compose up</code>)?
       </div>
     )
   }

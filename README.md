@@ -1,63 +1,69 @@
 # BC Healthcare Resource Engine
 
-A lightweight Python dashboard for exploring and forecasting acute care bed utilization across British Columbia’s health authorities.
+A lightweight analytics demo for exploring acute care bed utilization across British Columbia’s health authorities. The project combines a synthetic data pipeline, a FastAPI backend, and a React/Vite dashboard to show historical trends and short-term forecasts.
 
-## Purpose
+## What this app does
 
-This project combines a small data pipeline with an interactive dashboard to visualize historical capacity trends and short-term utilization forecasts. It is designed to help users understand how bed utilization evolves over time and to surface potential pressure points for planning and resource allocation.
+The app models regional capacity pressure by generating synthetic monthly healthcare metrics, transforming them into utilization indicators, forecasting the next six months with Prophet, and presenting the results through an interactive dashboard.
 
-## Stack
+## Current architecture
 
-- Python 3
-- Streamlit for the interactive web dashboard
-- pandas and NumPy for data processing
-- Plotly for charts and visualizations
-- Prophet for time-series forecasting
-- SQLite for local data storage
+The repository now follows a three-layer architecture:
+
+- Data pipeline: Python scripts in [pipeline](pipeline) generate synthetic raw data and produce cleaned, forecasted output in SQLite.
+- API layer: FastAPI in [api/main.py](api/main.py) serves dashboard data through endpoints such as /api/regions, /api/kpis, /api/metrics, and /api/regions/{region_id}/series.
+- Frontend: React + Vite in [frontend](frontend) renders the overview and region drill-down pages.
 
 ## How it works
 
-1. The pipeline extracts synthetic monthly healthcare metrics for each regional health authority.
-2. The transformation step creates utilization metrics, applies smoothing, and generates a 6-month forecast.
-3. The Streamlit app loads the resulting SQLite dataset and displays KPIs, trend charts, and the underlying data table.
+1. The extractor in [pipeline/extractor.py](pipeline/extractor.py) creates synthetic monthly health metrics for each health authority.
+2. The transformer in [pipeline/transformer.py](pipeline/transformer.py) calculates bed utilization, applies a 3-month moving average, and runs a Prophet forecast for six future months.
+3. The processed data is written to SQLite in [data](data), with tables for raw metrics and the cleaned forecasted dataset.
+4. The FastAPI service reads the SQLite database and exposes structured JSON endpoints for the frontend.
+5. The frontend requests those endpoints and renders KPI cards, a regional map, charts, and a detail table.
 
 ## Project structure
 
-- app.py: main Streamlit dashboard
-- pipeline/extractor.py: generates synthetic raw healthcare data
-- pipeline/transformer.py: transforms the data and creates forecasts
-- data/: local SQLite database and supporting data files
+- [api/main.py](api/main.py): FastAPI backend
+- [pipeline/extractor.py](pipeline/extractor.py): synthetic data generation
+- [pipeline/transformer.py](pipeline/transformer.py): smoothing and forecasting
+- [frontend](frontend): React/Vite dashboard
+- [data](data): SQLite database and generated data files
+
+## Tech stack
+
+- Python 3
+- FastAPI + Uvicorn for the backend API
+- React + Vite + TypeScript for the frontend
+- pandas, NumPy, and scikit-learn for data preparation
+- Prophet for time-series forecasting
+- SQLite for local storage
 
 ## Getting started
 
-### 1. Install dependencies
+The app runs entirely with Docker — [Docker](https://docs.docker.com/get-docker/) with Compose v2 is the only prerequisite.
+
+### 1. (Optional) Generate the dataset
+
+A prebuilt SQLite database is committed at [data/bc_healthcare.db](data/bc_healthcare.db), so you can skip this step. To regenerate it from scratch, run the one-shot pipeline service:
 
 ```bash
-pip install -r requirements.txt
+docker compose run --rm pipeline
 ```
 
-### 2. Generate the local data
+This runs the extractor and transformer inside a container and writes the SQLite database to [data/bc_healthcare.db](data/bc_healthcare.db) via a bind mount.
+
+### 2. Start the app
 
 ```bash
-python pipeline/extractor.py
-python pipeline/transformer.py
+docker compose up
 ```
 
-### 3. Launch the dashboard
+This builds and starts the FastAPI backend on http://localhost:8000 and the Vite dev server on http://localhost:5173, with the frontend's `/api` proxy routed to the backend container. The `frontend` and `data` directories are bind-mounted, so edits and dataset changes are picked up without rebuilding.
 
-```bash
-streamlit run app.py
-```
+Then open http://localhost:5173. Stop everything with `docker compose down`.
 
-You can also run the app directly with:
+## Notes
 
-```bash
-python app.py
-```
-
-## What you will see
-
-- A regional health authority selector in the sidebar
-- Current utilization metrics and alert-style status indicators
-- A time-series chart showing historical trends and forecast values
-- A data table with the underlying transformed results
+- The dataset is synthetic and intended for demonstration and testing rather than production decision-making.
+- The current UI exposes bed utilization forecasting; other metrics shown in the design are placeholders until the pipeline produces them.

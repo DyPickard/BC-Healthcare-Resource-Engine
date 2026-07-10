@@ -15,7 +15,7 @@ export default function OverviewPage({ regions, kpis }: Props) {
   return (
     <div
       style={{
-        padding: '56px 56px 120px',
+        padding: 'clamp(20px, 4vw, 56px) clamp(16px, 4vw, 56px) 120px',
         display: 'flex',
         flexDirection: 'column',
         gap: 32,

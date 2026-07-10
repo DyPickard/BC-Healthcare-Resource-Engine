@@ -11,11 +11,11 @@ END_DATE = "2026-06"
 # bias weights reflect StatsCan demographic profiles to test ETL 
 # and forecasting pipelines against realistic, privacy-compliant data.
 HEALTH_AUTHORITIES = {
-    "Interior Health": {"base_beds": 1400, "elderly_bias": 1.25},
-    "Fraser Health": {"base_beds": 2800, "elderly_bias": 1.05},
-    "Vancouver Coastal Health": {"base_beds": 2200, "elderly_bias": 1.10},
-    "Island Health": {"base_beds": 1600, "elderly_bias": 1.35},
-    "Northern Health": {"base_beds": 600, "elderly_bias": 0.95}
+    "Interior Health": {"base_beds": 1400, "elderly_bias": 1.00},
+    "Fraser Health": {"base_beds": 2800, "elderly_bias": 0.90},
+    "Vancouver Coastal Health": {"base_beds": 2200, "elderly_bias": 0.85},
+    "Island Health": {"base_beds": 1600, "elderly_bias": 1.10},
+    "Northern Health": {"base_beds": 600, "elderly_bias": 0.80}
 }
 
 def generate_provincial_health_data():

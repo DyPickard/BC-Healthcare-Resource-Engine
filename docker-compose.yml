@@ -1,0 +1,31 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_PROXY_TARGET=http://api:8000
+    depends_on:
+      - api
+
+  # One-shot data pipeline. Regenerates data/bc_healthcare.db.
+  # Run with: docker compose run --rm pipeline
+  pipeline:
+    build: .
+    profiles: ["tools"]
+    volumes:
+      - ./data:/app/data
+    command: >
+      sh -c "python pipeline/extractor.py && python pipeline/transformer.py"
