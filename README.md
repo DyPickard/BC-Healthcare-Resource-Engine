@@ -1,5 +1,7 @@
 # BC Healthcare Resource Engine
 
+__See it working here:__ [BC Healthcare Data Dashboard](https://bc-healthcare-data-dashboard.onrender.com/)
+
 A lightweight analytics demo for exploring acute care bed utilization across British Columbia’s health authorities. The project combines a synthetic data pipeline, a FastAPI backend, and a React/Vite dashboard to show historical trends and short-term forecasts.
 
 ## What this app does
